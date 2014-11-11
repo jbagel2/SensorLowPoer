@@ -30,11 +30,12 @@ void CheckMotion()
 {
 	if(MotionDetected)
 	{
+		//MotionDetected = 0;
 		justTriggeredByMotionISR = 1;
-		sprintf(buffer,"M:%d\r\n",MotionDetected);
+		sprintf(buffer,"M:%d\r\n",1);
 		serial.sendString(buffer);
-		_delay_ms(150); // wait for transmission to finish
 		MotionDetected = 0;
+		_delay_ms(150); // wait for transmission to finish		
 		EIMSK |= (1<<INT1);
 	}
 	
