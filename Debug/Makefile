@@ -37,6 +37,7 @@ SUBDIRS :=
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../Analog.cpp \
+../nrf24.c \
 ../dht22New.c \
 ../SensorLowPower.cpp \
 ../Serial_USART.cpp \
@@ -51,6 +52,7 @@ ASM_SRCS +=
 
 OBJS +=  \
 Analog.o \
+nrf24.o \
 dht22New.o \
 SensorLowPower.o \
 Serial_USART.o \
@@ -58,6 +60,7 @@ wiring8.o
 
 OBJS_AS_ARGS +=  \
 Analog.o \
+nrf24.o \
 dht22New.o \
 SensorLowPower.o \
 Serial_USART.o \
@@ -65,6 +68,7 @@ wiring8.o
 
 C_DEPS +=  \
 Analog.d \
+nrf24.d \
 dht22New.d \
 SensorLowPower.d \
 Serial_USART.d \
@@ -72,6 +76,7 @@ wiring8.d
 
 C_DEPS_AS_ARGS +=  \
 Analog.d \
+nrf24.d \
 dht22New.d \
 SensorLowPower.d \
 Serial_USART.d \
@@ -88,6 +93,8 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 LIB_DEP+= 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

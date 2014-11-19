@@ -18,15 +18,20 @@
 
 
 //circular buffer size
-#define BUF_SIZE 128
+#define BUF_SIZE 64
 
 static volatile uint8_t TxBuf[BUF_SIZE];
 //buffer mem address (for circular buffer)
 static volatile uint8_t UART_TxHead;
 static volatile uint8_t UART_TxTail;
 
+static volatile char RxBuf[BUF_SIZE];
+static volatile uint8_t UART_RxHead;
+static volatile uint8_t UART_RxTail;
+uint8_t UART_RX_Data_Waiting = 0;
 
 #define UART_TX0_BUFFER_MASK ( BUF_SIZE - 1)
+#define UART_RX0_BUFFER_MASK ( BUF_SIZE - 1)
 
 
 
@@ -146,6 +151,22 @@ void add_charToBuffer(uint8_t data)
 	UCSRB    |= (1<<UDRIE0);
 
 } /* uart0_putc */
+
+void add_charToRxBuffer(uint8_t data)
+{
+	uint16_t tmpheadRx;
+
+	tmpheadRx  = (UART_RxHead + 1) & UART_RX0_BUFFER_MASK;
+
+	while ( tmpheadRx == UART_RxTail );/* wait for free space in buffer */
+
+	RxBuf[tmpheadRx] = data;
+	UART_RxHead = tmpheadRx;
+
+	/* enable UDRE interrupt */
+	UCSRB    |= (1<<UDRIE0);
+
+	} /* uart0_putc */
 	
 void uart0_puts(const char *s )
 {
@@ -198,12 +219,15 @@ uint8_t charPosition;
 
 char *textBuf;
 void Serial::sendString(const char *text)
-{
-	
+{	
 	uart0_puts(text);
 	sei();
-
 	UCSR0B |= (1<<UDRIE0);
+}
+
+void Serial::getReceivedData()
+{
+	//return RxBuf;
 }
 
 char receiveByte() {
@@ -253,25 +277,33 @@ uint8_t lastAddress =0;
 
 #define UART0_TRANSMIT_INTERRUPT USART_UDRE_vect
 
-
+uint8_t incomming;
 ISR(USART_RX_vect)
 {
-	
-
-	uint8_t incomming;
 	cli();
-	UCSRA &= ~(1<<RXC);
+	sleep_disable();
+	EIMSK &= ~(1<<INT0);
+	
 	
 	incomming = UDR;
-	UCSR0A &= ~(1<<RXC0);
-	incomming = UDR0;
+	UCSRA &= ~(1<<RXC);
 
-
-	add_charToBuffer(incomming);
-	add_charToBuffer('\r');
-	sleep_disable();
+	if((incomming != '\0') || (incomming != '\r'))
+	{		
+		add_charToRxBuffer(incomming);
+	//add_charToRxBuffer('\r');
+	}
+	else
+	{
+		add_charToRxBuffer('\0');
+		UART_RX_Data_Waiting = 1;
+	}
 	
+	//Echo back for testing
+	//UDR = incomming;
 	
+	EIMSK |= (1<<INT0);
+	sei();
 }
 
 

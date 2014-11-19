@@ -8,6 +8,10 @@
  *  Current iteration uses watchdog timer to wake up from sleep ever 8Sec x WDT_Multiplyer Count
  *  
  */ 
+#define USE_NRF24L01 0
+#define USE_ESP8266 0
+
+
 
 #include "stdio.h"
 
@@ -19,6 +23,12 @@
 #include "Analog.h"
 #include "PowerSave.h"
 #include "Senors.h"
+
+#if USE_NRF24L01
+#include "nrf24.h"
+#else
+
+#endif
 
 
 char buffer[28];
@@ -41,16 +51,27 @@ void CheckMotion()
 	
 }
 
-
+//NRF24 references
+uint8_t temp;
+uint8_t q = 0;
+uint8_t data_array[4];
+uint8_t tx_address[5] = {0xD7,0xD7,0xD7,0xD7,0xD7};
+uint8_t rx_address[5] = {0xE7,0xE7,0xE7,0xE7,0xE7};
+//NRF24 references
 
 int main(void)
 {
+	#if USE_NRF24L01
+	nrf24_init();
+	nrf24_config(2,10);
+	nrf24_tx_address(tx_address);
+	nrf24_rx_address(rx_address);
+	#endif
 	
 	
 	DDRD &= ~(1<<3); //set motion Pin as input
 	PORTD &= ~(1<<3); //Make sure pullup is disabled.
 	WDTPowerSave_RunAtSystemStart();
-	//cli();
 	PowerReduction();
 	init(); //Starts timer for millis and micro and delay()
 	delay(250);
@@ -61,8 +82,6 @@ int main(void)
 	uint8_t motionData = 0;
 	serial.sendString("Boot Complete\r\n");
 	double Ftemp = 0.0;
-	//cli();
-	//SetWDT();
 	DHT22_DATA_t sensor_values;
 	configureMotionISR();
 	//DHT22_ERROR_t error;
@@ -77,7 +96,28 @@ int main(void)
 		 motionData = ReadMotion();
 		 Ftemp = (((float)sensor_values.raw_temperature / 10.0) * 1.8) + 32;
 		 sprintf(buffer,"F:%.2f,H:%.2f,L:%d,M:%d\r\n", Ftemp,(double)sensor_values.raw_humidity / 10, light,motionData);
+		 
+		 #if USE_NRF24L01
+		 //Convert data to byte array for nrf24
+		 nrf24_send(data_array);
+		 
+		 /* Wait for transmission to end */
+		 while(nrf24_isSending());
+		 temp = nrf24_lastMessageStatus();
+		 temp = nrf24_retransmissionCount();
+		 nrf24_powerUpRx();
+		 #endif
+		 
+		 /* Or you might want to power down after TX */
+		 // nrf24_powerDown();
+		 
+		 
 		 serial.sendString(buffer);
+		}
+		if(serial.UART_RX_Data_Waiting)
+		{
+			//serial.RxBuf
+			//serial.sendString(serial.getReceivedData());
 		}
 		else
 		{

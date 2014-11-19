@@ -13,7 +13,7 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 
-const static uint8_t WDT_Multiplyer = 1;
+const static uint8_t WDT_Multiplyer = 4;
 
 
 void PowerReduction()
@@ -78,7 +78,9 @@ uint8_t WDTTriggerCount = 1;
 
 ISR(WDT_vect)
 {
+	
 	cli();
+	
 	//MCUSR = 0;
 	WDTCSR |= (1<<WDCE) | (1<<WDIE);
 	WDTCSR &= ~(1<<WDIF);

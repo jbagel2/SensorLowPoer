@@ -31,21 +31,35 @@ void configureMotionISR()
 {
 	cli();
 	EICRA |= (1<<ISC10) | (1<<ISC11); //Set for Rising Edge trigger
-	EIMSK |= (1<<INT1);
+	EIMSK |= (1<<INT1) | (1<<INT0);
 	
 }
+
+
+void configureUCSRRX_INT_ISR()
+{
+	
+	
+};
 
 
 //ISR for Motion INT1
 ISR(INT1_vect)
 {
 	cli();
+	sleep_disable();
 	motionStatus = 1;
 	MotionDetected = 1;
-	EIMSK &= ~(1<<INT1); //Disable Interupt untill it has a chance to transmit, is re-enabled after transmit
-	sleep_disable();
-	sei();
-	
+	EIMSK &= ~(1<<INT1); //Disable Interupt untill it has a chance to transmit, is re-enabled after transmit	
+	sei();	
+}
+
+ISR(INT0_vect)
+{
+
+//test wake from sleep for data receive
+//should only need to be here to wake and notice there is USART data
+
 }
 
 #endif
