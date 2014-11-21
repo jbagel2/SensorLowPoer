@@ -18,7 +18,7 @@ const static uint8_t WDT_Multiplyer = 4;
 
 void PowerReduction()
 {
-	PRR |= (1<<PRTIM1) | (1<<PRTIM2) | (1<<PRTWI);
+	PRR |= (1<<PRTIM2) | (1<<PRTWI);
 }
 
 void SetINT0Int()

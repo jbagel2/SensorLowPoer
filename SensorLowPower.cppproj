@@ -30,7 +30,7 @@
       <ToolOptions>
         <InterfaceProperties>
           <IspClock>125000</IspClock>
-          <DebugWireClockDiv>0</DebugWireClockDiv>
+          <DebugWireClockDiv>8000</DebugWireClockDiv>
         </InterfaceProperties>
         <InterfaceName>debugWIRE</InterfaceName>
       </ToolOptions>
@@ -141,12 +141,6 @@
     <Compile Include="Analog.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="nrf24.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="nrf24.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="definitions.h">
       <SubType>compile</SubType>
     </Compile>
@@ -175,6 +169,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Serial_USART.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="VirtualWireTxShrunk.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="VirtualWireTxShunk.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="wiring8.cpp">

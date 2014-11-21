@@ -29,9 +29,10 @@ static volatile char RxBuf[BUF_SIZE];
 static volatile uint8_t UART_RxHead;
 static volatile uint8_t UART_RxTail;
 uint8_t UART_RX_Data_Waiting = 0;
+#define UART_RX0_BUFFER_MASK ( BUF_SIZE - 1)
 
 #define UART_TX0_BUFFER_MASK ( BUF_SIZE - 1)
-#define UART_RX0_BUFFER_MASK ( BUF_SIZE - 1)
+
 
 
 
